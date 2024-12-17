@@ -124,7 +124,7 @@ if(isset($_POST['check']))
 
         // Execute the query
         $result = $conn->query($sql);
-
+        
         // Check if the query was successful
         if ($result)
         {
@@ -295,20 +295,63 @@ if(isset($_POST['check']))
 <?php
     if(isset($_POST['book']))
     {
-        $name=$_POST["name"];
-        $email=$_POST["email"];
-        $phone_number=$_POST["number"];
-        $date_debut =$_POST["check_in"];
-        $date_fin =$_POST["check_out"];
-        $nombre_room_they_want =$_POST["rooms"];
-        
-        $sql = "INSERT INTO Client (Client_name,Client_email,Client_phone) 
-                VALUES ('$name', '$email','$nombre_room_they_want')";
-        $conn->query($sql);
 
-        $sql = "SELECT Client_id FROM Client WHERE Client_name = ?";
+    // Enable error reporting
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
 
-             }
+    // Database connection (ensure you replace with your credentials)
+    $name = $_POST["name"];
+    $email = $_POST["email"];
+    $phone_number = $_POST["number"];
+    $date_debut = $_POST["check_in"];
+    $date_fin = $_POST["check_out"];
+    $nombre_room_they_want = $_POST["rooms"];
+
+    // Insert Client
+    $sql = "INSERT INTO Client (Client_name, Client_email, Client_phone) 
+            VALUES ('$name', '$email', '$phone_number')";
+    $conn->query($sql);
+
+    // Retrieve Client ID
+    $sql = "SELECT Client_id FROM Client 
+            WHERE (Client_name = '$name') AND (Client_email = '$email') AND (Client_phone = '$phone_number')";
+      $result = $conn->query($sql);
+    
+      if ($result && $result->num_rows > 0) {
+          $row = $result->fetch_assoc();
+          $Client_id = $row["Client_id"]; // Assign Client_id
+      } else {
+          die("Client not found. Check your database.");
+      }
+  
+      // Fetch Available Rooms
+      $sql = "SELECT Room_id 
+              FROM Room 
+              WHERE Room_id NOT IN (
+                  SELECT Room_id FROM Allocation 
+                  WHERE (Allocation_debut < '$date_fin' AND Allocation_fin > '$date_fin') 
+                     OR (Allocation_debut < '$date_debut' AND Allocation_fin > '$date_debut')
+              )";
+      $result = $conn->query($sql);
+  
+      if ($result && $result->num_rows > 0) {
+          $index = 1;
+          while (($row = $result->fetch_assoc()) && $index <= $nombre_room_they_want) {
+              $Room_id = $row['Room_id'];
+  
+              // Insert Allocation
+              $sql = "INSERT INTO Allocation (Allocation_debut, Allocation_fin, Client_id, Room_id) 
+                      VALUES ('$date_debut', '$date_fin', '$Client_id', '$Room_id')";
+              $conn->query($sql);
+  
+              $index++;
+          }
+          echo '<br><br>Rooms successfully allocated.<br>';
+      } else {
+          echo "No rooms available for the selected dates.";
+      }
+    }
 
 ?>
 </section>
