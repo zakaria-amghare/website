@@ -124,6 +124,32 @@ table,td,th
         </table>
 
     </section>
+    <h1>Messages</h1>
+        <table id="Table_Messages">
+            <thead>
+                <tr>
+                    <th>Message </th>
+                    <th>email</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                $sql=' SELECT * FROM Messages';
+                $result = $conn->query($sql);
+
+                while ($row = $result->fetch_assoc()) {
+                    echo "<tr>";
+                    echo "<td>" . $row["Message_email"] . "</td>";
+                    echo "<td>" . $row["Message_text"] . "</td>";
+                    echo "</tr>";
+                }   
+                echo "hhaha" . $row["Message_text"] ;
+
+                ?>
+            </tbody>
+        </table>
+
+    </section>
 
     
 </body>

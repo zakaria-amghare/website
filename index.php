@@ -307,37 +307,8 @@ if(isset($_POST['check']))
         $conn->query($sql);
 
         $sql = "SELECT Client_id FROM Client WHERE Client_name = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param('s', $name); 
-        $stmt->execute();
 
-        $stmt->bind_result($client_id);
-  /*       
-        $sql = "SELECT Room_id 
-        FROM Room 
-        WHERE Room_id NOT IN 
-        (
-            SELECT Room_id 
-            FROM Allocation a 
-            WHERE (Allocation_debut < '$date_fin' AND Allocation_fin > '$date_fin') 
-            OR (Allocation_debut < '$date_debut' AND Allocation_fin > '$date_debut') 
-        )";
-            echo 'test 1';
-            
-            $result = $conn->query($sql);
-            echo 'test 2';
-
-        while ($row = $result->fetch_assoc())
-        {
-            echo 'avalebal rooms id are' .$row["Room_id"];
-        }
-        echo 'test 3';
-*/
-
-        
-        //$sql = "INSERT INTO Allocation (Allocation_debut,Allocation_fin,Client_id,Room_id) VALUES ('$date_debut','$date_fin''$Client_id','$Room_id')";
-        //$conn->query($sql);
-    }
+             }
 
 ?>
 </section>
@@ -375,12 +346,22 @@ if(isset($_POST['check']))
 
       <form action="" method="post">
          <h3>send us message</h3>
-         <input type="text" name="name" required maxlength="50" placeholder="Enter your name" class="box">
          <input type="email" name="email" required maxlength="50" placeholder="Enter your email" class="box">
-         <input type="number" name="number" required maxlength="10" min="0" max="9999999999" placeholder="Enter your number" class="box">
          <textarea name="message" class="box" required maxlength="1000" placeholder="Enter your message" cols="30" rows="10"></textarea>
          <input type="submit" value="send message" name="send" class="btn">
       </form>
+
+      <?php
+            if(isset($_POST['send']))
+            {
+               $message=$_POST['message'];
+               $email=$_POST['email'];
+
+               $sql = "INSERT INTO Message (Message_text, Message_email) VALUES ('$message', '$email')";
+               $conn->query($sql);
+               
+            }
+      ?>
 
       <div class="faq">
          <h3 class="title">frequently asked questions</h3>
